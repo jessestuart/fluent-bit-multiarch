@@ -3,10 +3,6 @@
 mkdir build && cd build || return
 git clone https://github.com/${GITHUB_REPO} --depth=1 .
 
-cd lib
-rm -rf luajit-2.0.5
-curl http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz | tar xz
-
 # <qemu-support>
 if [ "$QEMU_ARCH" = 'amd64' ]; then
   touch qemu-amd64-static
