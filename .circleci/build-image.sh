@@ -4,7 +4,7 @@ git clone https://github.com/${GITHUB_REPO} --depth=1 &>/dev/null
 
 # ============
 # <qemu-support>
-if [ $GOARCH == 'amd64' ]; then
+if [ "$GOARCH" = 'amd64' ]; then
   touch qemu-amd64-static
 else
 
