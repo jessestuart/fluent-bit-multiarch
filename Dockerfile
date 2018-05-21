@@ -35,16 +35,18 @@ RUN \
 
 WORKDIR /tmp/src/build/
 RUN ls -alh
-RUN cmake -DFLB_DEBUG=On \
-  -DFLB_TRACE=Off \
-  -DFLB_JEMALLOC=On \
+RUN cmake \
   -DFLB_BUFFERING=On \
-  -DFLB_TLS=On \
-  -DFLB_WITHOUT_SHARED_LIB=On \
-  -DFLB_WITHOUT_EXAMPLES=On \
+  -DFLB_DEBUG=Off \
   -DFLB_HTTP_SERVER=On \
+  -DFLB_JEMALLOC=On \
+  -DFLB_LUAJIT=Off \
+  -DFLB_TLS=On \
+  -DFLB_TRACE=Off \
+  -DFLB_WITHOUT_EXAMPLES=On \
+  -DFLB_WITHOUT_SHARED_LIB=On \
   -DFLB_OUT_KAFKA=On ..
-RUN make
+RUN make -j8
 RUN install bin/fluent-bit /fluent-bit/bin/
 
 # Configuration files
