@@ -46,6 +46,7 @@ RUN cmake \
   -DFLB_WITHOUT_EXAMPLES=On \
   -DFLB_WITHOUT_SHARED_LIB=On \
   -DFLB_OUT_KAFKA=On ..
+
 RUN make -j8
 RUN install bin/fluent-bit /fluent-bit/bin/
 
@@ -58,7 +59,12 @@ COPY conf/fluent-bit.conf \
   conf/parsers_cinder.conf \
   /fluent-bit/etc/
 
+# =================
 FROM $target/debian
+# =================
+
+COPY qemu-$ARCH-static* /usr/bin/
+
 LABEL maintainer="Jesse Stuart <hi@jessestuart.com>"
 LABEL Description="Fluent Bit docker image" Vendor="Fluent Organization" Version="1.1"
 

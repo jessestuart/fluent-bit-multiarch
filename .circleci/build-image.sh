@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mkdir build && cd build || return
+mkdir build && cd build
 git clone https://github.com/${GITHUB_REPO} --depth=1 .
 
 # <qemu-support>
@@ -19,10 +19,10 @@ export IMAGE_ID="${IMAGE}:${VERSION}-${TAG}"
 docker build -t ${IMAGE_ID} --build-arg target=$TARGET --build-arg arch=$QEMU_ARCH .
 
 # Login to Docker Hub.
-# echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
-# # Push push push
-# docker push ${IMAGE_ID}
-# if [ $CIRCLE_BRANCH == 'master' ]; then
-#   docker tag "${IMAGE_ID}" "${REGISTRY}/${IMAGE}:latest-${TAG}"
-#   docker push "${REGISTRY}/${IMAGE}:latest-${TAG}"
-# fi
+echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+# Push push push
+docker push ${IMAGE_ID}
+if [ $CIRCLE_BRANCH == 'master' ]; then
+  docker tag "${IMAGE_ID}" "${REGISTRY}/${IMAGE}:latest-${TAG}"
+  docker push "${REGISTRY}/${IMAGE}:latest-${TAG}"
+fi
