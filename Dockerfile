@@ -1,10 +1,7 @@
 ARG target
 FROM $target/debian as builder
 
-ARG arch
-ENV ARCH=$arch
-
-COPY qemu-$ARCH-static* /usr/bin/
+COPY qemu-* /usr/bin/
 
 # Fluent Bit version
 ENV FLB_MAJOR 0
@@ -63,7 +60,7 @@ COPY conf/fluent-bit.conf \
 FROM $target/debian
 # =================
 
-COPY qemu-$ARCH-static* /usr/bin/
+COPY qemu-* /usr/bin/
 
 LABEL maintainer="Jesse Stuart <hi@jessestuart.com>"
 LABEL Description="Fluent Bit docker image" Vendor="Fluent Organization" Version="1.1"
