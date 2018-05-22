@@ -4,12 +4,12 @@ build_jobs: &build_jobs
   jobs:
     - build-amd64
     - build-arm64
-    - build-armhf
+    # - build-armhf
     - push-manifest:
         requires:
           - build-amd64
           - build-arm64
-          - build-armhf
+          # - build-armhf
 
 workflows:
   version: 2
@@ -25,7 +25,7 @@ workflows:
               only:
                 - master
 
-shared: &shared
+build_tasks: &build_tasks
   docker:
     - image: docker:18-git
   steps:
@@ -45,72 +45,53 @@ shared: &shared
           .circleci/load_env.sh
 
     - run:
-        name: Build and push Docker image.
+        name: Build Docker image.
         command: |
           source $BASH_ENV
-          .circleci/build-image.sh
+          .circleci/build_image.sh
+
+    - run:
+        name: Push Docker image.
+        command: |
+          source $BASH_ENV
+          .circleci/push_image.sh
 
 jobs:
   build-amd64:
-    <<: *shared
+    <<: *build_tasks
     environment:
       TAG: amd64
       TARGET: amd64
       QEMU_ARCH: amd64
   build-arm64:
-    <<: *shared
+    <<: *build_tasks
     environment:
       QEMU_ARCH: aarch64
       QEMU_VERSION: v2.11.0
       TAG: arm64
       TARGET: arm64v8
   build-armhf:
-    <<: *shared
+    <<: *build_tasks
     environment:
       QEMU_ARCH: arm
       QEMU_VERSION: v2.11.0
       TAG: arm
       TARGET: arm32v7
-  # push-manifest:
-  #   docker:
-  #     - image: docker:18
-  #   environment:
-  #   steps:
-  #     - setup_remote_docker
+  push-manifest:
+    docker:
+      - image: docker:18
+    environment:
+    steps:
+      - setup_remote_docker
 
-  #     - run:
-  #         name: Determine repo version.
-  #         command: |
-  #           apk add --no-cache curl jq
-  #           curl -sL https://api.github.com/repos/${GITHUB_REPO}/releases/latest | jq -r ".tag_name" > ~/VERSION
+      - run:
+          name: Load environment variables & pull latest release tag.
+          command: |
+            apk add --no-cache curl jq
+            .circleci/load_env.sh
 
-  #     - run:
-  #         name: Install manifest-tool.
-  #         command: |
-  #           echo "Downloading manifest-tool."
-  #           wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
-  #           mv manifest-tool-linux-amd64 /usr/bin/manifest-tool
-  #           chmod +x /usr/bin/manifest-tool
-  #           manifest-tool --version
-
-  #     - run:
-  #         name: Push Docker manifest.
-  #         command: |
-  #           export VERSION=$(cat ~/VERSION)
-  #           echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin;
-  #           manifest-tool push from-args \
-  #             --platforms linux/amd64,linux/arm,linux/arm64 \
-  #             --template "$REGISTRY/$IMAGE:$VERSION-ARCH" \
-  #             --target "$REGISTRY/$IMAGE:$VERSION"
-  #           if [ "${CIRCLE_BRANCH}" == 'master' ]; then
-  #             manifest-tool push from-args \
-  #               --platforms linux/amd64,linux/arm,linux/arm64 \
-  #               --template "$REGISTRY/$IMAGE:$VERSION-ARCH" \
-  #               --target "$REGISTRY/$IMAGE:latest"
-  #           fi
-
-  #     - run:
-  #         name: Verify manifest was persisted remotely.
-  #         command: |
-  #           export VERSION=$(cat ~/VERSION)
-  #           manifest-tool inspect "$REGISTRY/$IMAGE:$VERSION"
+      - run:
+          name: Push Docker manifest.
+          command: |
+            source $BASH_ENV
+            .circleci/push_manifest.sh
