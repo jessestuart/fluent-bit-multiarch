@@ -36,12 +36,18 @@ RUN cmake \
   -DFLB_BUFFERING=On \
   -DFLB_DEBUG=Off \
   -DFLB_HTTP_SERVER=On \
+  # "Jemalloc is an alternative memory allocator that can reduce fragmentation
+  # (among others things) resulting in better performance."
   -DFLB_JEMALLOC=On \
+  # Luajit v2.0.5 fails to compile on arm64.
+  # (Experimental support is available in the v2.1.x-beta branch)
   -DFLB_LUAJIT=Off \
+  -DFLB_METRICS=On \
   -DFLB_TLS=On \
   -DFLB_TRACE=Off \
   -DFLB_WITHOUT_EXAMPLES=On \
   -DFLB_WITHOUT_SHARED_LIB=On \
+  # Kafka is the only "output" plugin disabled by default in CMakeLists.
   -DFLB_OUT_KAFKA=On ..
 
 RUN make -j8
