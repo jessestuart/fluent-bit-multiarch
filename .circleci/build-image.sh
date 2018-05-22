@@ -16,7 +16,7 @@ fi
 cp -f $DIR/Dockerfile .
 
 export IMAGE_ID="${IMAGE}:${VERSION}-${TAG}"
-docker build -t ${IMAGE_ID} --build-arg target=$TARGET --build-arg .
+docker build -t ${IMAGE_ID} --build-arg target=$TARGET .
 
 # Login to Docker Hub.
 echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
