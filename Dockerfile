@@ -1,4 +1,6 @@
 ARG target
+# Super simple base image built on `$target/debian`,
+# with below dependencies pre-installed.
 FROM jessestuart/fluent-bit-builder as builder
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -8,6 +10,19 @@ RUN mkdir -p /fluent-bit/bin /fluent-bit/etc /fluent-bit/log /tmp/src/
 COPY . /tmp/src/
 
 RUN rm -rf /tmp/src/build/*
+
+# These should already be installed by the base image.
+RUN \
+  apt update -yq && \
+  apt install -yq \
+    build-essential \
+    cmake \
+    libasl-dev \
+    libssl1.0-dev \
+    libsystemd-dev \
+    make \
+    unzip \
+    wget
 
 WORKDIR /tmp/src/build/
 RUN cmake \
