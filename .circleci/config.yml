@@ -79,7 +79,7 @@ jobs:
       TARGET: arm32v7
   push-manifest:
     docker:
-      - image: docker:18
+      - image: docker:18-git
     environment:
     steps:
       - checkout

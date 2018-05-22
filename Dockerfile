@@ -1,37 +1,15 @@
 ARG target
-FROM $target/debian as builder
-
-COPY qemu-* /usr/bin/
-
-# Fluent Bit version
-ENV FLB_MAJOR 0
-ENV FLB_MINOR 13
-ENV FLB_PATCH 0
-ENV FLB_VERSION 0.13.0
+FROM jessestuart/fluent-bit-builder as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN mkdir -p /fluent-bit/bin /fluent-bit/etc /fluent-bit/log /tmp/src/
 
 COPY . /tmp/src/
-RUN ls -alh /tmp/src
 
 RUN rm -rf /tmp/src/build/*
 
-RUN \
-  apt update -yq && \
-  apt install -yq \
-    build-essential \
-    cmake \
-    libasl-dev \
-    libssl1.0-dev \
-    libsystemd-dev \
-    make \
-    unzip \
-    wget
-
 WORKDIR /tmp/src/build/
-RUN ls -alh
 RUN cmake \
   -DFLB_BUFFERING=On \
   -DFLB_DEBUG=Off \
@@ -76,6 +54,7 @@ RUN apt-get update \
   && apt-get install --no-install-recommends ca-certificates libssl1.0.2 -y \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get autoclean
+
 COPY --from=builder /fluent-bit /fluent-bit
 
 EXPOSE 2020
