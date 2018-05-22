@@ -2,7 +2,7 @@
 
 source $BASH_ENV
 
-export PLATFORMs="linux/amd64,linux/arm64"
+export PLATFORMS="linux/amd64,linux/arm64"
 
 echo "Downloading manifest-tool."
 wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64

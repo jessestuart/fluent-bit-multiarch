@@ -82,6 +82,7 @@ jobs:
       - image: docker:18
     environment:
     steps:
+      - checkout
       - setup_remote_docker
 
       - run:
