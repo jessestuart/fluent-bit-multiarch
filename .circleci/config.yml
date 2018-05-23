@@ -69,14 +69,14 @@ jobs:
       QEMU_ARCH: aarch64
       QEMU_VERSION: v2.11.0
       TAG: arm64
-      TARGET: arm64v8
+      TARGET: arm
   build-armhf:
     <<: *build_tasks
     environment:
       QEMU_ARCH: arm
       QEMU_VERSION: v2.11.0
       TAG: arm
-      TARGET: arm32v7
+      TARGET: arm
   push-manifest:
     docker:
       - image: docker:18-git

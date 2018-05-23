@@ -1,7 +1,10 @@
 ARG target
 # Super simple base image built on `$target/debian`,
 # with below dependencies pre-installed.
-FROM jessestuart/fluent-bit-builder as builder
+# FROM jessestuart/fluent-bit-builder as builder
+FROM gcr.io/google-containers/debian-base-$target:0.3
+
+COPY qemu-* /usr/bin/
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -56,7 +59,7 @@ COPY conf/fluent-bit.conf \
   /fluent-bit/etc/
 
 # =================
-FROM $target/debian
+FROM gcr.io/google-containers/debian-base-$target:0.3
 # =================
 
 COPY qemu-* /usr/bin/
