@@ -2,7 +2,7 @@ ARG target
 # Super simple base image built on `$target/debian`,
 # with below dependencies pre-installed.
 # FROM jessestuart/fluent-bit-builder as builder
-FROM gcr.io/google-containers/debian-base-$target:0.3
+FROM gcr.io/google-containers/debian-base-$target:0.3 as builder
 
 COPY qemu-* /usr/bin/
 
