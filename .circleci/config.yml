@@ -4,12 +4,10 @@ build_jobs: &build_jobs
   jobs:
     - build-amd64
     - build-arm
-    # - build-armhf
     - push-manifest:
         requires:
           - build-amd64
           - build-arm
-          # - build-armhf
 
 workflows:
   version: 2
@@ -70,13 +68,6 @@ jobs:
       QEMU_VERSION: v2.11.0
       TAG: arm64
       TARGET: arm
-  # build-armhf:
-  #   <<: *build_tasks
-  #   environment:
-  #     QEMU_ARCH: arm
-  #     QEMU_VERSION: v2.11.0
-  #     TAG: arm
-  #     TARGET: arm
   push-manifest:
     docker:
       - image: docker:18-git

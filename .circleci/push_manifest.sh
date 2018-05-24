@@ -2,10 +2,8 @@
 
 source $BASH_ENV
 
-docker tag "$IMAGE:$VERSION-arm64" "$IMAGE:$VERSION-arm"
-docker push "$IMAGE:$VERSION-arm"
-
-export PLATFORMS="linux/amd64,linux/arm64,linux/arm"
+docker tag "$IMAGE:$VERSION-arm" "$IMAGE:$VERSION-arm64"
+docker push "$IMAGE:$VERSION-arm64"
 
 echo "Downloading manifest-tool."
 wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
