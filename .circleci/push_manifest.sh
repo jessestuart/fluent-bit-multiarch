@@ -1,9 +1,11 @@
 #!/bin/sh
 
 source $BASH_ENV
+echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin;
 
-docker tag "$IMAGE:$VERSION-arm" "$IMAGE:$VERSION-arm64"
-docker push "$IMAGE:$VERSION-arm64"
+docker pull "$IMAGE:$VERSION-arm64"
+docker tag "$IMAGE:$VERSION-arm64" "$IMAGE:$VERSION-arm"
+docker push "$IMAGE:$VERSION-arm"
 
 echo "Downloading manifest-tool."
 wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
@@ -13,7 +15,6 @@ manifest-tool --version
 
 # =============================================================================
 
-echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin;
 manifest-tool push from-args \
   --platforms "$PLATFORMS" \
   --template "$IMAGE:$VERSION-ARCH" \
