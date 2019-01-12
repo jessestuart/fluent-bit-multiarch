@@ -1,13 +1,15 @@
-version: 2.0
+version: 2.1
 
 build_jobs: &build_jobs
   jobs:
     - build-amd64
-    - build-arm
+    # - build-arm
+    - build-arm64
     - push-manifest:
         requires:
           - build-amd64
-          - build-arm
+          # - build-arm
+          - build-arm64
 
 workflows:
   version: 2
@@ -27,7 +29,6 @@ build_tasks: &build_tasks
   docker:
     - image: docker:18-git
   steps:
-
     - checkout
 
     - setup_remote_docker:
@@ -39,8 +40,7 @@ build_tasks: &build_tasks
 
     - run:
         name: Add dynamic shared vars to env.
-        command: |
-          .circleci/load_env.sh
+        command: .circleci/load_env.sh
 
     - run:
         name: Build Docker image.
@@ -54,6 +54,25 @@ build_tasks: &build_tasks
           source $BASH_ENV
           .circleci/push_image.sh
 
+push_manifest: &push_manifest
+  docker:
+    - image: docker:18-git
+  steps:
+    - checkout
+    - setup_remote_docker
+
+    - run:
+        name: Load environment variables & pull latest release tag.
+        command: |
+          apk add --no-cache curl jq
+          .circleci/load_env.sh
+
+    - run:
+        name: Push Docker manifest.
+        command: |
+          source $BASH_ENV
+          .circleci/push_manifest.sh
+
 jobs:
   build-amd64:
     <<: *build_tasks
@@ -61,29 +80,11 @@ jobs:
       TAG: amd64
       TARGET: amd64
       QEMU_ARCH: amd64
-  build-arm:
+  build-arm64:
     <<: *build_tasks
     environment:
       QEMU_ARCH: aarch64
-      QEMU_VERSION: v2.11.0
+      QEMU_VERSION: v3.1.0
       TAG: arm64
-      TARGET: arm
-  push-manifest:
-    docker:
-      - image: docker:18-git
-    environment:
-    steps:
-      - checkout
-      - setup_remote_docker
-
-      - run:
-          name: Load environment variables & pull latest release tag.
-          command: |
-            apk add --no-cache curl jq
-            .circleci/load_env.sh
-
-      - run:
-          name: Push Docker manifest.
-          command: |
-            source $BASH_ENV
-            .circleci/push_manifest.sh
+      TARGET: arm64
+  push-manifest: *push_manifest
