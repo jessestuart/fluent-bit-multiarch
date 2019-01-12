@@ -1,5 +1,7 @@
 ARG target
-FROM debian:stretch as builder
+FROM $target/debian:stretch as builder
+
+COPY qemu-* /usr/bin/
 
 # Fluent Bit version
 ENV FLB_MAJOR 1
@@ -52,23 +54,28 @@ COPY conf/fluent-bit.conf \
      conf/plugins.conf \
      /fluent-bit/etc/
 
-FROM gcr.io/distroless/cc
-LABEL maintainer="Jesse Stuart <hi@jessestuart.com>"
-LABEL Description="Fluent Bit docker image" Vendor="Fluent Organization" Version="1.1"
+FROM $target/debian:stretch
 
-COPY --from=builder /usr/lib/x86_64-linux-gnu/*sasl* /usr/lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libz* /usr/lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/libz* /lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.so* /usr/lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.so* /usr/lib/x86_64-linux-gnu/
+ARG lib_target
+
+COPY qemu-* /usr/bin/
+
+LABEL maintainer="Jesse Stuart <hi@jessestuart.com>"
+LABEL Description="Fluent Bit Docker image" Vendor="Fluent Organization" Version="1.1"
+
+COPY --from=builder /usr/lib/${lib_target}-linux-gnu/*sasl* /usr/lib/${lib_target}-linux-gnu/
+COPY --from=builder /usr/lib/${lib_target}-linux-gnu/libz* /usr/lib/${lib_target}-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/libz* /lib/${lib_target}-linux-gnu/
+COPY --from=builder /usr/lib/${lib_target}-linux-gnu/libssl.so* /usr/lib/${lib_target}-linux-gnu/
+COPY --from=builder /usr/lib/${lib_target}-linux-gnu/libcrypto.so* /usr/lib/${lib_target}-linux-gnu/
 # These below are all needed for systemd
-COPY --from=builder /lib/x86_64-linux-gnu/libsystemd* /lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/libselinux.so* /lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/liblzma.so* /lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/liblz4.so* /usr/lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/libgcrypt.so* /lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/libpcre.so* /lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/libgpg-error.so* /lib/x86_64-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/libsystemd* /lib/${lib_target}-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/libselinux.so* /lib/${lib_target}-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/liblzma.so* /lib/${lib_target}-linux-gnu/
+COPY --from=builder /usr/lib/${lib_target}-linux-gnu/liblz4.so* /usr/lib/${lib_target}-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/libgcrypt.so* /lib/${lib_target}-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/libpcre.so* /lib/${lib_target}-linux-gnu/
+COPY --from=builder /lib/${lib_target}-linux-gnu/libgpg-error.so* /lib/${lib_target}-linux-gnu/
 
 COPY --from=builder /fluent-bit /fluent-bit
 
@@ -76,24 +83,3 @@ EXPOSE 2020
 
 # # Entry point
 CMD ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
-
-# # =================
-# FROM gcr.io/google-containers/debian-base-$target:0.3
-# # =================
-
-# COPY qemu-* /usr/bin/
-
-# LABEL maintainer="Jesse Stuart <hi@jessestuart.com>"
-# LABEL Description="Fluent Bit docker image" Vendor="Fluent Organization" Version="1.1"
-
-# RUN apt-get update \
-#   && apt-get dist-upgrade -y \
-#   && apt-get install --no-install-recommends ca-certificates libssl1.0.2 -y \
-#   && rm -rf /var/lib/apt/lists/* \
-#   && apt-get autoclean
-
-# COPY --from=builder /fluent-bit /fluent-bit
-
-# EXPOSE 2020
-
-# CMD ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]

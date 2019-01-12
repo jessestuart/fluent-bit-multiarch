@@ -77,14 +77,16 @@ jobs:
   build-amd64:
     <<: *build_tasks
     environment:
+      LIB_TARGET: x86_64
       TAG: amd64
       TARGET: amd64
       QEMU_ARCH: amd64
   build-arm64:
     <<: *build_tasks
     environment:
+      LIB_TARGET: aarch64
       QEMU_ARCH: aarch64
-      QEMU_VERSION: v3.1.0
+      QEMU_VERSION: v3.1.0-2
       TAG: arm64
-      TARGET: arm64
+      TARGET: arm64v8
   push-manifest: *push_manifest
